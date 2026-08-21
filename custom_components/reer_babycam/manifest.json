@@ -1,7 +1,7 @@
 {
   "domain": "reer_babycam",
   "name": "reer IP BabyCam",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "config_flow": true,
   "documentation": "https://github.com/phoebos02/ha-reercam",
   "issue_tracker": "https://github.com/phoebos02/ha-reercam/issues",
