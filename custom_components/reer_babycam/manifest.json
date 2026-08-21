@@ -1,0 +1,11 @@
+{
+  "domain": "reer_babycam",
+  "name": "reer IP BabyCam",
+  "version": "0.1.0-alpha.1",
+  "config_flow": true,
+  "documentation": "https://github.com/phoebos02/ha-reercam",
+  "issue_tracker": "https://github.com/phoebos02/ha-reercam/issues",
+  "codeowners": ["@phoebos02"],
+  "integration_type": "device",
+  "iot_class": "local_polling"
+}
