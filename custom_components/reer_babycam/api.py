@@ -1,8 +1,7 @@
 """Verified local HTTP protocol for reer IP BabyCam."""
 
-from asyncio import TimeoutError
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 
 from aiohttp import (
     ClientConnectionError,

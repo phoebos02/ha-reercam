@@ -28,9 +28,9 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `43f7e5d19cf1f6cf8badf8461f8980571d0d901a`.
+- Current `main`: `6b898b8758f00f57852b75fa7cbb45c8d0291391`.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, six commits behind `main`.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, seven commits behind `main`.
 - Current `main` passes Test, Hassfest, and HACS workflows.
 - The local runnable checks pass but use hand-written Home Assistant, aiohttp,
   and yarl stubs rather than the real target environment.
@@ -62,18 +62,18 @@ By user decision on 2026-08-22:
 
 ## Active plan
 
-Step 6a is active. Steps must run in the order below.
+Step 6 is active. Steps must run in the order below.
 
 ### Step 6a — Quick repository and release cleanup
 
-**Status:** `started`
+**Status:** `verified`
 
-**Latest result:** The correction Engineer retained and fixed the Release
-badge, changed HACS Default to HACS Custom, and deleted the remaining local
-alpha.3 tag. The independent Verifier found no implementation or scope defect,
-but returned `FAIL` solely because the correction is uncommitted and retained
-workflows have therefore not run against it. Completion is tracked in [#2
-Finish repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).
+**Latest result:** Commit `6b898b8` retains and fixes the Release badge,
+changes HACS Default to HACS Custom, and follows deletion of the remaining
+local alpha.3 tag. Test, Hassfest, and HACS pass on the pushed commit. The final
+independent Verifier returned `PASS` with no findings or unverified items; the
+user directed work to proceed to Step 6. The completed finding is [#2 Finish
+repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).
 
 **Goal:** Resolve the small repository and release-history problems before
 establishing the new test baseline.
@@ -105,8 +105,8 @@ full README completion, tooling configuration, and new releases.
 - [x] Local checks pass; retained GitHub workflows pass against the committed
   cleanup.
 - [x] Local checks pass against the current badge correction.
-- [ ] Retained GitHub workflows pass against the committed badge correction.
-- [ ] Independent Verifier passes and the user agrees the step is complete.
+- [x] Retained GitHub workflows pass against the committed badge correction.
+- [x] Independent Verifier passes and the user agrees the step is complete.
 
 **Tracked finding:** [#2 Finish repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).
 
@@ -116,7 +116,13 @@ full README completion, tooling configuration, and new releases.
 
 ### Step 6 — Real Home Assistant 2026.8 test baseline
 
-**Status:** `not started`
+**Status:** `started`
+
+**Latest result:** The correction Engineer added parameterized runtime camera
+authentication/connection and secret-safety coverage; 28 real tests and Ruff
+pass. The independent Verifier found no remaining local implementation or
+scope defect, but returned `FAIL` solely because Test, HACS, and Hassfest cannot
+run against the uncommitted state.
 
 **Goal:** Verify the existing alpha.5 behavior against Home Assistant 2026.8
 and establish the complete minimal test, lint, and CI foundation.

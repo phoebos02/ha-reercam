@@ -47,12 +47,12 @@ async def async_setup_entry(
 
     try:
         info = await client.async_get_info()
-    except ReerBabyCamConnectionError as err:
-        raise ConfigEntryNotReady("Could not connect to camera") from err
-    except ReerBabyCamAuthError as err:
-        raise ConfigEntryError("Camera authentication failed") from err
-    except ReerBabyCamProtocolError as err:
-        raise ConfigEntryError("Camera returned an invalid response") from err
+    except ReerBabyCamConnectionError:
+        raise ConfigEntryNotReady("Could not connect to camera") from None
+    except ReerBabyCamAuthError:
+        raise ConfigEntryError("Camera authentication failed") from None
+    except ReerBabyCamProtocolError:
+        raise ConfigEntryError("Camera returned an invalid response") from None
 
     entry.runtime_data = ReerBabyCamRuntimeData(client, info)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
