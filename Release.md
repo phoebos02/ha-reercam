@@ -2,9 +2,10 @@
 
 ## Status
 
-`0.1.0-alpha.5` is an unreleased alpha prerelease for Home Assistant 2026.8+ and the reer IP BabyCam 80300, verified with camera firmware `42.7.3.4.70`. The intended Git tag, release title, and HACS version are `v0.1.0-alpha.5`.
+This guide prepares the intended `0.1.0-alpha.5` alpha prerelease for Home Assistant 2026.8+ and the reer IP BabyCam 80300, verified with camera firmware `42.7.3.4.70`. The intended Git tag, release title, and HACS version are `v0.1.0-alpha.5`.
 
-The alpha.5 release is incomplete until the manual review, commit, push, GitHub release, HACS installation, and physical-camera checks below are completed.
+> [!WARNING]
+> **Known tag mismatch:** `v0.1.0-alpha.3` points to code whose manifest says `0.1.0-alpha.5`. Do not install that tag or use it for rollback. No correct alpha.3 snapshot has been established, so do not recreate it.
 
 ## Pre-release review
 
@@ -12,6 +13,13 @@ Run these commands manually from the repository root. They are the release gate;
 
 ```bash
 git status --short
+git rev-parse HEAD
+git rev-parse main
+git rev-parse upstream/main
+git ls-remote --heads upstream main
+git tag --list 'v0.1.0-alpha.*' --format='%(refname:short) %(objectname)'
+git ls-remote --tags upstream 'v0.1.0-alpha.*'
+git show v0.1.0-alpha.3:custom_components/reer_babycam/manifest.json
 git diff --stat
 git diff
 python3 tests/test_api.py
@@ -24,21 +32,50 @@ python3 -c 'import json; assert json.load(open("custom_components/reer_babycam/m
 git diff --check
 ```
 
-Review `git status` carefully before staging any remaining accumulated files. Do not force-push.
+Confirm that the manifest says `0.1.0-alpha.5`. The alpha.3 tag inspection must show the mismatch described above. `upstream/main` is only the local remote-tracking reference; compare it with the read-only `git ls-remote` result.
+
+If the worktree is clean and the intended release content is already committed on the pushed `main` commit, skip commit and push. If this guide correction or other intended files remain, inspect every path before `git add -A`, then commit and normally push. Never force-push.
 
 ```bash
 git status --short
+git diff
 git add -A
 git diff --cached --stat
 git diff --cached
 git diff --cached --check
-git commit -m "feat: add functional reer baby camera"
+git commit -m "docs: correct alpha release guide"
 git push upstream main
 ```
 
+### Optional manual cleanup of the mislabeled alpha.3
+
+Deleting a published GitHub Release or tag rewrites public release metadata. This is optional and must be an explicit user decision; none of these cleanup actions are part of the release checks.
+
+1. On GitHub, open **Releases** and check whether a `v0.1.0-alpha.3` Release object exists.
+2. If you explicitly choose cleanup, open that Release, select **Delete**, and confirm deletion. Do not create a replacement alpha.3 Release.
+3. Only if you also explicitly choose to delete the mislabeled tag, run:
+
+   ```bash
+   git push --delete upstream v0.1.0-alpha.3
+   git tag -d v0.1.0-alpha.3
+   ```
+
+These commands are destructive instructions for manual use only. Do not run them merely to create alpha.5.
+
 ## GitHub prerelease
 
-After the push, follow the [GitHub release instructions](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository):
+First confirm that `main` is clean and pushed and that alpha.5 does not already exist:
+
+```bash
+git status --short
+git rev-parse HEAD
+git rev-parse upstream/main
+git ls-remote --heads upstream main
+git tag --list v0.1.0-alpha.5
+git ls-remote --tags upstream refs/tags/v0.1.0-alpha.5
+```
+
+The two alpha.5 tag commands must return no tag. Then follow the [GitHub release instructions](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository):
 
 1. Open **Releases** and select **Draft a new release**.
 2. Create tag `v0.1.0-alpha.5` from the pushed `main` commit.
@@ -64,7 +101,7 @@ After the push, follow the [GitHub release instructions](https://docs.github.com
 
 5. Select **Set as a pre-release** and publish.
 
-Do not continue until GitHub shows the new `v0.1.0-alpha.5` release; it does not exist remotely merely because these instructions name it.
+Do not continue until GitHub shows the new `v0.1.0-alpha.5` release; this guide does not establish that it exists remotely.
 
 ## Install or update with HACS
 
@@ -129,6 +166,6 @@ SANITIZED LOGS: <none or relevant lines; redact passwords and credential URLs>
 
 ## Roll back
 
-Back up Home Assistant before rollback. Use HACS **Redownload** to select a previous version only if HACS actually lists one, then restart Home Assistant.
+Back up Home Assistant before rollback. Never select `v0.1.0-alpha.3`; it contains mislabeled alpha.5 code. Use HACS **Redownload** to select another previous version only if HACS actually lists one, then restart Home Assistant.
 
 If no previous version is listed, remove the integration entry using Home Assistant's [standard removal steps](https://www.home-assistant.io/common-tasks/general/#removing-an-integration-instance), remove the HACS repository, and restore the backup or known-good manually saved integration files. Deleting the integration entry removes its device and entities; removing only the HACS repository does not remove its Home Assistant data.
