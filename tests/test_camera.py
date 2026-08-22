@@ -6,7 +6,7 @@ import pytest
 from aiohttp import ClientConnectionError
 from homeassistant.components.camera.const import DATA_COMPONENT
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, STATE_UNAVAILABLE
+from homeassistant.const import CONF_HOST, CONF_PASSWORD
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -87,7 +87,6 @@ async def test_setup_camera_device_snapshot_stream_and_unload(hass) -> None:
     await hass.async_block_till_done()
     assert entry.state is ConfigEntryState.NOT_LOADED
     assert hass.data[DATA_COMPONENT].get_entity(entity_id) is None
-    assert hass.states.get(entity_id).state == STATE_UNAVAILABLE
 
 
 async def test_optional_firmware(hass) -> None:

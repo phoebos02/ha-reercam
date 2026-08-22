@@ -2,8 +2,8 @@
 
 import asyncio
 import hashlib
-import re
 from collections.abc import Callable
+from urllib.request import parse_http_list, parse_keqv_list
 
 import pytest
 from aiohttp import ClientSession, ClientTimeout, web
@@ -18,6 +18,7 @@ from custom_components.reer_babycam.api import (
 
 PASSWORD = "s/e:c@r?e#t%"
 JPEG = b"\xff\xd8jpeg\xff\xd9"
+pytestmark = pytest.mark.usefixtures("socket_enabled")
 
 
 async def _server(aiohttp_server, monkeypatch, handler: Callable):
@@ -28,16 +29,6 @@ async def _server(aiohttp_server, monkeypatch, handler: Callable):
     return server
 
 
-def _digest_fields(header: str) -> dict[str, str]:
-    return {
-        key: quoted or bare
-        for key, quoted, bare in re.findall(
-            r'(\w+)=(?:"([^"]*)"|([^,\s]+))', header.removeprefix("Digest ")
-        )
-    }
-
-
-@pytest.mark.usefixtures("socket_enabled")
 async def test_real_digest_exchange(aiohttp_server, monkeypatch) -> None:
     """Complete and validate an actual aiohttp Digest exchange."""
     nonce = "test-nonce"
@@ -54,7 +45,9 @@ async def test_real_digest_exchange(aiohttp_server, monkeypatch) -> None:
                     )
                 },
             )
-        fields = _digest_fields(authorization)
+        fields = parse_keqv_list(
+            parse_http_list(authorization.removeprefix("Digest "))
+        )
         ha1 = hashlib.md5(f"admin:ip camera:{PASSWORD}".encode()).hexdigest()
         ha2 = hashlib.md5(f"GET:{fields['uri']}".encode()).hexdigest()
         expected = hashlib.md5(
@@ -82,7 +75,6 @@ async def test_real_digest_exchange(aiohttp_server, monkeypatch) -> None:
     assert authenticated == ["/get_params.cgi", "/get_properties.cgi"]
 
 
-@pytest.mark.usefixtures("socket_enabled")
 async def test_optional_firmware(aiohttp_server, monkeypatch) -> None:
     async def handler(request: web.Request) -> web.Response:
         text = "var id='camera-1';" if request.path == "/get_params.cgi" else ""
@@ -95,7 +87,6 @@ async def test_optional_firmware(aiohttp_server, monkeypatch) -> None:
     assert info.firmware_version is None
 
 
-@pytest.mark.usefixtures("socket_enabled")
 @pytest.mark.parametrize("status", [401, 403])
 async def test_auth_statuses(aiohttp_server, monkeypatch, status: int) -> None:
     async def handler(_: web.Request) -> web.Response:
@@ -107,7 +98,6 @@ async def test_auth_statuses(aiohttp_server, monkeypatch, status: int) -> None:
             await ReerBabyCamClient(server.host, PASSWORD, session).async_get_info()
 
 
-@pytest.mark.usefixtures("socket_enabled")
 async def test_timeout(aiohttp_server, monkeypatch) -> None:
     async def handler(_: web.Request) -> web.Response:
         await asyncio.sleep(1)
@@ -119,7 +109,6 @@ async def test_timeout(aiohttp_server, monkeypatch) -> None:
             await ReerBabyCamClient(server.host, PASSWORD, session).async_get_info()
 
 
-@pytest.mark.usefixtures("socket_enabled")
 async def test_connection_failure(monkeypatch, unused_tcp_port: int) -> None:
     monkeypatch.setattr(api, "DEFAULT_PORT", unused_tcp_port)
     async with ClientSession() as session:
@@ -128,7 +117,6 @@ async def test_connection_failure(monkeypatch, unused_tcp_port: int) -> None:
     assert PASSWORD not in str(error.value)
 
 
-@pytest.mark.usefixtures("socket_enabled")
 async def test_redirect_is_not_followed(aiohttp_server, monkeypatch) -> None:
     forwarded = False
 
@@ -151,19 +139,6 @@ async def test_redirect_is_not_followed(aiohttp_server, monkeypatch) -> None:
     assert forwarded is False
 
 
-@pytest.mark.usefixtures("socket_enabled")
-@pytest.mark.parametrize("status", [302, 500])
-async def test_unexpected_status(aiohttp_server, monkeypatch, status: int) -> None:
-    async def handler(_: web.Request) -> web.Response:
-        return web.Response(status=status)
-
-    server = await _server(aiohttp_server, monkeypatch, handler)
-    async with ClientSession() as session:
-        with pytest.raises(ReerBabyCamProtocolError, match="status"):
-            await ReerBabyCamClient(server.host, PASSWORD, session).async_get_info()
-
-
-@pytest.mark.usefixtures("socket_enabled")
 @pytest.mark.parametrize(
     "body",
     [
@@ -183,7 +158,6 @@ async def test_invalid_identity(aiohttp_server, monkeypatch, body: str) -> None:
             await ReerBabyCamClient(server.host, PASSWORD, session).async_get_info()
 
 
-@pytest.mark.usefixtures("socket_enabled")
 async def test_malformed_firmware(aiohttp_server, monkeypatch) -> None:
     async def handler(request: web.Request) -> web.Response:
         text = (
@@ -199,7 +173,6 @@ async def test_malformed_firmware(aiohttp_server, monkeypatch) -> None:
             await ReerBabyCamClient(server.host, PASSWORD, session).async_get_info()
 
 
-@pytest.mark.usefixtures("socket_enabled")
 async def test_snapshot(aiohttp_server, monkeypatch) -> None:
     async def handler(_: web.Request) -> web.Response:
         return web.Response(body=JPEG, content_type="image/jpeg")
@@ -214,14 +187,13 @@ async def test_snapshot(aiohttp_server, monkeypatch) -> None:
         )
 
 
-@pytest.mark.usefixtures("socket_enabled")
 @pytest.mark.parametrize(
-    ("status", "body", "content_type"),
+    ("status", "body", "content_type", "error_type"),
     [
-        (401, JPEG, "image/jpeg"),
-        (500, JPEG, "image/jpeg"),
-        (200, b"", "image/jpeg"),
-        (200, JPEG, "text/plain"),
+        (401, JPEG, "image/jpeg", ReerBabyCamAuthError),
+        (500, JPEG, "image/jpeg", ReerBabyCamProtocolError),
+        (200, b"", "image/jpeg", ReerBabyCamProtocolError),
+        (200, JPEG, "text/plain", ReerBabyCamProtocolError),
     ],
 )
 async def test_invalid_snapshot(
@@ -230,13 +202,14 @@ async def test_invalid_snapshot(
     status: int,
     body: bytes,
     content_type: str,
+    error_type: type[Exception],
 ) -> None:
     async def handler(_: web.Request) -> web.Response:
         return web.Response(status=status, body=body, content_type=content_type)
 
     server = await _server(aiohttp_server, monkeypatch, handler)
     async with ClientSession() as session:
-        with pytest.raises((ReerBabyCamAuthError, ReerBabyCamProtocolError)) as error:
+        with pytest.raises(error_type) as error:
             await ReerBabyCamClient(
                 server.host, PASSWORD, session
             ).async_get_snapshot()

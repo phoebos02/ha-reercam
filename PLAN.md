@@ -28,12 +28,12 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `6b898b8758f00f57852b75fa7cbb45c8d0291391`.
+- Current `main`: `ea5a6e21e5ca6f89e85ef19456edcfc9bf9e5006`.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, seven commits behind `main`.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, eight commits behind `main`.
 - Current `main` passes Test, Hassfest, and HACS workflows.
-- The local runnable checks pass but use hand-written Home Assistant, aiohttp,
-  and yarl stubs rather than the real target environment.
+- Step 6 replaces the hand-written stubs with 26 tests against Python 3.14.2,
+  Home Assistant 2026.8.3, and real aiohttp/yarl; pytest and Ruff pass.
 - Alpha.5 implements the narrow HTTP client, runtime setup, one device, one
   camera entity, snapshots, and streaming.
 - Configuration validation, config-entry identity, duplicate prevention,
@@ -118,11 +118,17 @@ full README completion, tooling configuration, and new releases.
 
 **Status:** `started`
 
-**Latest result:** The correction Engineer added parameterized runtime camera
-authentication/connection and secret-safety coverage; 28 real tests and Ruff
-pass. The independent Verifier found no remaining local implementation or
-scope defect, but returned `FAIL` solely because Test, HACS, and Hassfest cannot
-run against the uncommitted state.
+**Latest result:** Commit `ea5a6e2` contains the complete Engineer and coverage
+correction passes. The fresh GitHub Test workflow installs Python 3.14.2 and
+the pinned Home Assistant 2026.8.3 environment; Test, HACS, and Hassfest all
+pass. Final independent reverification returned `PASS` with no findings or
+unverified items. By user direction, the Engineer then applied all six
+optional Ponytail test simplifications, and a focused follow-up now proves the
+HTTP status-to-exception mapping explicitly. The final independent Verifier
+returned `PASS` with no findings: all 26 tests, Ruff, dependency and repository
+checks pass, the test/dependency diff remains 33 lines smaller, and no
+production or CI files changed. The result is ready to commit; post-push Test,
+HACS, and Hassfest evidence is still required before Step 6 acceptance.
 
 **Goal:** Verify the existing alpha.5 behavior against Home Assistant 2026.8
 and establish the complete minimal test, lint, and CI foundation.

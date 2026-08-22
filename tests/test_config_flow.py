@@ -21,12 +21,8 @@ async def test_user_form_and_entry_creation(hass) -> None:
         key.schema: selector
         for key, selector in result["data_schema"].schema.items()
     }
-    assert list(schema) == [
-        CONF_HOST,
-        CONF_PASSWORD,
-    ]
+    assert set(schema) == {CONF_HOST, CONF_PASSWORD}
     assert schema[CONF_PASSWORD].config["type"] == "password"
-    assert schema[CONF_PASSWORD].config["autocomplete"] == "current-password"
 
     data = {CONF_HOST: "camera.local", CONF_PASSWORD: "secret"}
     result = await hass.config_entries.flow.async_configure(
