@@ -2,7 +2,8 @@
 
 This is the persistent implementation plan for `architecture-v2.md`. Keep it
 updated whenever a step starts, is verified, changes scope, or gains findings.
-`FINDINGS.md` is the corresponding persistent findings ledger.
+GitHub Issues are the authoritative findings tracker and session-recovery
+record.
 
 ## Process
 
@@ -14,19 +15,23 @@ The coordinator follows `codex-prompt-v1.md`:
    acceptance criteria.
 4. Give one independent Verifier the architecture, Engineer prompt, report,
    and resulting repository state.
-5. Present the result and findings to the user.
+5. Present the result and findings to the user, and update their GitHub Issues.
 6. Mark the step `verified` only after a Verifier pass and user agreement.
+
+In user-facing output, render a GitHub finding as plain text containing its
+number followed by its title, for example `#2 Finish repository cleanup
+verification`; never show a bare number, URL, or hyperlink.
 
 Allowed statuses are `not started`, `started`, and `verified`.
 
 ## Recovered baseline
 
-As of 2026-08-22:
+As of 2026-08-23:
 
-- Current `main`: `42961330274337eaea0eea33521be7bc098382d7`.
+- Current `main`: `ed62ce008cdbf49e9480fc822d7bf72718ca3f40`.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, four commits behind `main`.
-- Current `main` passes CI, Test, Hassfest, and HACS workflows.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, five commits behind `main`.
+- Current `main` passes Test, Hassfest, and HACS workflows.
 - The local runnable checks pass but use hand-written Home Assistant, aiohttp,
   and yarl stubs rather than the real target environment.
 - Alpha.5 implements the narrow HTTP client, runtime setup, one device, one
@@ -49,6 +54,12 @@ By user decision on 2026-08-22:
   supersedes the architecture document's original `0.1.0` completion label
   without changing its required behavior or scope boundaries.
 
+## Repository and release policy
+
+- Pull-request workflow triggers remain YAGNI until the repository actually
+  uses pull requests.
+- Published release tags are immutable: never move or reuse an existing tag.
+
 ## Active plan
 
 Step 6a is active. Steps must run in the order below.
@@ -57,18 +68,19 @@ Step 6a is active. Steps must run in the order below.
 
 **Status:** `started`
 
-**Latest result:** Engineer completed the local cleanup. Verifier returned
-`FAIL` because GitHub Release `374950984` and the local/remote
-`v0.1.0-alpha.3` tags still exist at
-`fffcd04b5673407549b87bbc38377204d16b81db`. Authenticated release deletion
-and an immediate user approval are still required. Retained workflows have not
-run against the uncommitted cleanup diff.
+**Latest result:** Commit `ed62ce0` removed the duplicate workflow and stale
+files; Test, Hassfest, and HACS passed. The public alpha.3 release and remote
+tag are deleted. The independent Verifier still returned `FAIL`: the local
+`v0.1.0-alpha.3` tag remains at `fffcd04`, and the expanded README contains
+scope and badge claims that are not yet accurate. Completion is tracked in
+[#2 Finish repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).
 
 **Goal:** Resolve the small repository and release-history problems before
 establishing the new test baseline.
 
-**Work already completed:** CI, Test, HACS, and Hassfest workflows exist and
-pass on current `main`; alpha.5 and the mislabeled alpha.3 are published.
+**Work already completed:** Test, HACS, and Hassfest workflows exist and pass
+on current `main`; alpha.5 is published, while the mislabeled public alpha.3
+release and remote tag have been deleted.
 
 **Outside this step:** New integration behavior, test-harness replacement,
 full README completion, tooling configuration, and new releases.
@@ -78,14 +90,24 @@ full README completion, tooling configuration, and new releases.
 - [x] Keep `test.yml` for per-check reporting and remove duplicate `ci.yml`.
 - [x] README no longer falsely describes the integration as an empty
   placeholder.
+- [ ] Keep the README within verified scope and remove misleading HACS Default
+  and latest-release badge claims.
 - [x] Delete stale alpha.5-specific `Release.md`; GitHub remains the release
   record and this plan owns future release gates.
 - [x] Remove unrelated `.vscode/settings.json`.
 - [x] Inspect the exact remote alpha.3 release and tag before changing either.
-- [ ] Delete the mislabeled public alpha.3 release and tag only after a final,
-  explicit user approval immediately before the destructive actions.
-- [ ] Local checks pass; retained GitHub workflows pass against the resulting
-  committed cleanup.
+- [x] Delete the mislabeled public alpha.3 release and remote tag after final,
+  explicit user approval.
+- [ ] Delete the remaining local `v0.1.0-alpha.3` tag.
+- [x] Local checks pass; retained GitHub workflows pass against the committed
+  cleanup.
+- [ ] Independent Verifier passes and the user agrees the step is complete.
+
+**Tracked finding:** [#2 Finish repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).
+
+**Resolved findings:** [#12 Remove duplicate CI workflow](https://github.com/phoebos02/ha-reercam/issues/12),
+[#13 Remove stale alpha.5 release notes file](https://github.com/phoebos02/ha-reercam/issues/13), and
+[#14 Remove unrelated VS Code command approval settings](https://github.com/phoebos02/ha-reercam/issues/14).
 
 ### Step 6 — Real Home Assistant 2026.8 test baseline
 
@@ -115,6 +137,10 @@ reauthentication, reconfiguration, branding, and documentation expansion.
 - Fix only compatibility defects in already-implemented scope.
 - Tests, Ruff, HACS validation, and Hassfest validation pass.
 
+**Tracked findings:** [#3 Establish a real Home Assistant test environment](https://github.com/phoebos02/ha-reercam/issues/3),
+[#4 Complete real API and camera coverage](https://github.com/phoebos02/ha-reercam/issues/4), and
+[#5 Add minimal static and reproducible CI checks](https://github.com/phoebos02/ha-reercam/issues/5).
+
 ### Step 7a — Release 0.1.0
 
 **Status:** `not started`
@@ -135,9 +161,10 @@ reauthentication, reconfiguration, branding, and the `0.2.0` line.
 - Release only a clean, pushed commit with all checks passing.
 - Obtain explicit user approval before creating/pushing the `v0.1.0` tag or
   publishing the GitHub release.
-- Never move or reuse an existing prerelease tag.
 - Persist a sanitized HACS and physical-camera smoke-test result for setup,
   snapshot, stream, reload/restart, unload/delete, and secret-free logs.
+
+**Tracked finding:** [#10 Record HACS and physical-camera verification](https://github.com/phoebos02/ha-reercam/issues/10).
 
 ### Step 7 — Complete config-entry lifecycle for 0.2.0
 
@@ -172,6 +199,10 @@ publication, and functionality excluded by architecture section 2.
 - Real Home Assistant tests cover every config-flow case in architecture
   section 20.2 and the affected lifecycle/camera paths.
 
+**Tracked findings:** [#6 Validate config flow and enforce camera identity](https://github.com/phoebos02/ha-reercam/issues/6),
+[#7 Complete setup, reauthentication, and reconfiguration](https://github.com/phoebos02/ha-reercam/issues/7), and
+[#8 Complete real Home Assistant lifecycle coverage](https://github.com/phoebos02/ha-reercam/issues/8).
+
 ### Step 8 — 0.2.0 release readiness and branding
 
 **Status:** `not started`
@@ -200,7 +231,11 @@ release publication.
   CI, security properties, and acceptance criteria.
 - No required criterion remains missing, partial, or supported only by an
   unstated assumption.
-- `FINDINGS.md` records every resolution or deliberate deferral.
+- GitHub Issues record every resolution or deliberate deferral.
+
+**Tracked findings:** [#8 Complete real Home Assistant lifecycle coverage](https://github.com/phoebos02/ha-reercam/issues/8),
+[#9 Complete architecture-v2 README](https://github.com/phoebos02/ha-reercam/issues/9), and
+[#11 Add Home Assistant brand assets](https://github.com/phoebos02/ha-reercam/issues/11).
 
 ### Step 9 — 0.2.0 prerelease and physical verification
 
@@ -224,6 +259,8 @@ completed architecture acceptance.
   stream, reload/restart, unload/delete, and secret-free logs on the physical
   camera.
 - Persist a sanitized manual verification result.
+
+**Tracked finding:** [#10 Record HACS and physical-camera verification](https://github.com/phoebos02/ha-reercam/issues/10).
 
 ### Step 10 — Final 0.2.0 release
 
