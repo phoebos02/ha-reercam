@@ -28,9 +28,9 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `ed62ce008cdbf49e9480fc822d7bf72718ca3f40`.
+- Current `main`: `43f7e5d19cf1f6cf8badf8461f8980571d0d901a`.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, five commits behind `main`.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, six commits behind `main`.
 - Current `main` passes Test, Hassfest, and HACS workflows.
 - The local runnable checks pass but use hand-written Home Assistant, aiohttp,
   and yarl stubs rather than the real target environment.
@@ -68,12 +68,12 @@ Step 6a is active. Steps must run in the order below.
 
 **Status:** `started`
 
-**Latest result:** Commit `ed62ce0` removed the duplicate workflow and stale
-files; Test, Hassfest, and HACS passed. The public alpha.3 release and remote
-tag are deleted. The independent Verifier still returned `FAIL`: the local
-`v0.1.0-alpha.3` tag remains at `fffcd04`, and the expanded README contains
-scope and badge claims that are not yet accurate. Completion is tracked in
-[#2 Finish repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).
+**Latest result:** The correction Engineer retained and fixed the Release
+badge, changed HACS Default to HACS Custom, and deleted the remaining local
+alpha.3 tag. The independent Verifier found no implementation or scope defect,
+but returned `FAIL` solely because the correction is uncommitted and retained
+workflows have therefore not run against it. Completion is tracked in [#2
+Finish repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).
 
 **Goal:** Resolve the small repository and release-history problems before
 establishing the new test baseline.
@@ -90,17 +90,22 @@ full README completion, tooling configuration, and new releases.
 - [x] Keep `test.yml` for per-check reporting and remove duplicate `ci.yml`.
 - [x] README no longer falsely describes the integration as an empty
   placeholder.
-- [ ] Keep the README within verified scope and remove misleading HACS Default
-  and latest-release badge claims.
+- [x] User explicitly accepted the expanded README scope.
+- [x] Retain the Release badge as explicitly requested while making its
+  prerelease presentation and target accurate.
+- [x] Remove the inaccurate HACS Default claim; retain an accurate custom-HACS
+  presentation if useful.
 - [x] Delete stale alpha.5-specific `Release.md`; GitHub remains the release
   record and this plan owns future release gates.
 - [x] Remove unrelated `.vscode/settings.json`.
 - [x] Inspect the exact remote alpha.3 release and tag before changing either.
 - [x] Delete the mislabeled public alpha.3 release and remote tag after final,
   explicit user approval.
-- [ ] Delete the remaining local `v0.1.0-alpha.3` tag.
+- [x] Delete the remaining local `v0.1.0-alpha.3` tag.
 - [x] Local checks pass; retained GitHub workflows pass against the committed
   cleanup.
+- [x] Local checks pass against the current badge correction.
+- [ ] Retained GitHub workflows pass against the committed badge correction.
 - [ ] Independent Verifier passes and the user agrees the step is complete.
 
 **Tracked finding:** [#2 Finish repository cleanup verification](https://github.com/phoebos02/ha-reercam/issues/2).

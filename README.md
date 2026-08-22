@@ -1,7 +1,7 @@
 # reer IP BabyCam
 
-[![Release](https://img.shields.io/github/v/release/phoebos02/ha-reercam?sort=semver)](https://github.com/phoebos02/ha-reercam/releases/latest)
-[![HACS](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
+[![Release](https://img.shields.io/github/v/release/phoebos02/ha-reercam?include_prereleases&sort=semver)](https://github.com/phoebos02/ha-reercam/releases)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](#installation-with-hacs)
 [![HACS validation](https://github.com/phoebos02/ha-reercam/actions/workflows/hacs.yml/badge.svg)](https://github.com/phoebos02/ha-reercam/actions/workflows/hacs.yml)
 [![Hassfest validation](https://github.com/phoebos02/ha-reercam/actions/workflows/hassfest.yml/badge.svg)](https://github.com/phoebos02/ha-reercam/actions/workflows/hassfest.yml)
 [![Tests](https://github.com/phoebos02/ha-reercam/actions/workflows/test.yml/badge.svg)](https://github.com/phoebos02/ha-reercam/actions/workflows/test.yml)
