@@ -1,90 +1,134 @@
-# Release `0.1.0-alpha.3`
+# Release `0.1.0-alpha.5`
 
-## Status and prerequisites
+## Status
 
-- Step 2 is implemented locally but is not committed, released, or user-verified.
-- Step 1 has no GitHub release or live HACS verification; it remains started.
-- The manifest version is `0.1.0-alpha.3`; use tag and release `v0.1.0-alpha.3` and mark it as a prerelease.
-- Home Assistant 2026.8+ and HACS must already be installed. Make a Home Assistant backup first.
+`0.1.0-alpha.5` is an unreleased alpha prerelease for Home Assistant 2026.8+ and the reer IP BabyCam 80300, verified with camera firmware `42.7.3.4.70`. The intended Git tag, release title, and HACS version are `v0.1.0-alpha.5`.
 
-## Review, commit, and push
+The alpha.5 release is incomplete until the manual review, commit, push, GitHub release, HACS installation, and physical-camera checks below are completed.
 
-Run manually from the repository root:
+## Pre-release review
+
+Run these commands manually from the repository root. They are the release gate; their presence here does not mean they have been run for the release.
 
 ```bash
 git status --short
-git diff --check
+git diff --stat
 git diff
-sed -n '1,220p' Release.md
+python3 tests/test_api.py
 python3 tests/test_scaffold.py
-python3 -m py_compile custom_components/reer_babycam/*.py tests/test_scaffold.py
+python3 -m py_compile custom_components/reer_babycam/__init__.py custom_components/reer_babycam/api.py custom_components/reer_babycam/camera.py custom_components/reer_babycam/config_flow.py tests/test_api.py tests/test_scaffold.py
 python3 -m json.tool custom_components/reer_babycam/manifest.json >/dev/null
 python3 -m json.tool custom_components/reer_babycam/strings.json >/dev/null
 python3 -m json.tool custom_components/reer_babycam/translations/en.json >/dev/null
-git add custom_components/reer_babycam/config_flow.py \
-  custom_components/reer_babycam/manifest.json \
-  custom_components/reer_babycam/strings.json \
-  custom_components/reer_babycam/translations/en.json \
-  tests/test_scaffold.py Release.md
-git diff --cached --check
+python3 -c 'import json; assert json.load(open("custom_components/reer_babycam/manifest.json"))["version"] == "0.1.0-alpha.5"'
+git diff --check
+```
+
+Review `git status` carefully before staging any remaining accumulated files. Do not force-push.
+
+```bash
+git status --short
+git add -A
 git diff --cached --stat
-git commit -m "feat: add simple camera configuration"
+git diff --cached
+git diff --cached --check
+git commit -m "feat: add functional reer baby camera"
 git push upstream main
 ```
 
-## Create the GitHub prerelease
+## GitHub prerelease
 
-1. Open the repository's **Releases** page and select **Draft a new release**.
-2. Create tag `v0.1.0-alpha.3` from `main` and use the same value as the title.
-3. Paste these release notes:
+After the push, follow the [GitHub release instructions](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository):
+
+1. Open **Releases** and select **Draft a new release**.
+2. Create tag `v0.1.0-alpha.5` from the pushed `main` commit.
+3. Use title `v0.1.0-alpha.5`.
+4. Paste these release notes:
 
    ```text
-   Step 2: simple configuration lifecycle
+   reer IP BabyCam 0.1.0-alpha.5
 
-   - Collects and stores host and password through Home Assistant's UI.
-   - Masks the password field.
-   - Keeps one placeholder device and one empty camera.
-   - Makes no network call and does not validate the camera or credentials.
+   - HACS installation and README guidance
+   - Home Assistant UI configuration for host and password
+   - Local HTTP Digest client for the verified camera endpoints
+   - Camera identity and optional firmware metadata
+   - Native JPEG snapshots
+   - Native live stream source using the verified ASF/H.264 stream
 
-   Snapshots, streaming, device identity, reauthentication, and reconfiguration are not included.
-   Existing alpha entries must be removed and added again to store host/password.
+   Deferred: configuration-time validation, duplicate prevention,
+   reauthentication, and host reconfiguration.
+
+   Requires Home Assistant 2026.8+. This is an alpha prerelease.
+   Existing older-alpha config entries must be removed and added again.
    ```
 
-4. Select **Set as a pre-release**, then publish.
+5. Select **Set as a pre-release** and publish.
+
+Do not continue until GitHub shows the new `v0.1.0-alpha.5` release; it does not exist remotely merely because these instructions name it.
 
 ## Install or update with HACS
 
-1. In HACS, open the top-right menu → **Custom repositories**.
-2. If absent, add `https://github.com/phoebos02/ha-reercam` as **Integration**.
-3. Open **reer IP BabyCam** and choose **Download**, or **Redownload** when already installed.
-4. Under **Need a different version?**, select `v0.1.0-alpha.3`. If testing before the tag appears, select `main` if offered; otherwise choose **Update information** and retry.
+Create and download a Home Assistant [backup](https://www.home-assistant.io/common-tasks/general/#backups) first.
+
+Use the [one-click HACS repository button](https://my.home-assistant.io/redirect/hacs_repository/?owner=phoebos02&repository=ha-reercam&category=integration), or add the repository manually:
+
+1. In HACS, open the three-dot menu → **Custom repositories**.
+2. Enter `https://github.com/phoebos02/ha-reercam`, choose **Integration**, then **Add**.
+3. Open **reer IP BabyCam** and select **Download**, or **Redownload** if already installed.
+4. Under **Need a different version?**, select `v0.1.0-alpha.5` after it is published.
 5. Restart Home Assistant.
 
-## Configure and verify
+See the official [custom repository](https://hacs.xyz/docs/faq/custom_repositories/), [repository dashboard](https://hacs.xyz/docs/use/repositories/dashboard/), and [update](https://hacs.xyz/docs/use/update/) instructions if the expected version is not shown.
 
-Existing alpha entries have no migration. Remove the old **reer IP BabyCam** entry under **Settings → Devices & services**, then add it again.
+## Configure Home Assistant
 
-1. Select **Add integration** → **reer IP BabyCam**.
-2. Confirm the form contains exactly **Host** and **Password**, both required, and the password is masked.
-3. Enter arbitrary values. Setup must succeed without reaching or validating a camera.
-4. Confirm exactly one placeholder device and one empty camera entity exist.
-5. Confirm no snapshot or stream is available; this is expected.
-6. Reload the entry, then restart Home Assistant; confirm everything returns without re-entering the values.
-7. Search Home Assistant logs for the submitted password; it must not appear.
-8. Delete the entry and confirm its entity/device unload cleanly.
+There is no migration for older alpha config entries. Remove the existing **reer IP BabyCam** entry and add it again:
 
-Report the result:
+1. Go to **Settings → Devices & services** and remove the old integration entry.
+2. Select **Add integration → reer IP BabyCam**.
+3. Enter the camera's bare IP address or hostname, without `http://`, and its password.
+4. Submit the form.
+
+The form stores the values without contacting the camera. Entry setup then contacts the camera and must succeed before the device and entity appear.
+
+## Manual verification
+
+With Home Assistant and the physical camera on the same trusted local network, verify:
+
+- [ ] HACS reports `0.1.0-alpha.5` after restart and Home Assistant reports no integration startup errors.
+- [ ] Exactly one reer device and one camera entity exist.
+- [ ] The device identifier matches the camera ID; manufacturer, model, serial, and firmware metadata are correct.
+- [ ] Opening the camera returns a non-empty JPEG snapshot.
+- [ ] Live view starts from the verified ASF/H.264 `stream=1` source.
+- [ ] Reloading the entry and restarting Home Assistant restore the same device and entity.
+- [ ] Deleting the entry unloads and removes its device/entity cleanly.
+- [ ] Logs and displayed errors contain no password, credential-bearing URL, Digest authorization material, or raw CGI body.
+
+Expected alpha limitations:
+
+- The config form does not validate before creating the entry.
+- A wrong password leaves setup failed; reauthentication is not implemented.
+- An unreachable camera leaves setup waiting for Home Assistant's retry behavior.
+- Duplicate prevention and host reconfiguration are not implemented.
+
+Report the result without secrets:
 
 ```text
 RESULT: PASS | FAIL
 HOME ASSISTANT: <version>
-INSTALLED FROM: v0.1.0-alpha.3 | main
-FAILED CHECK: <number or none>
-DETAILS/LOGS: <redact passwords>
+INTEGRATION: 0.1.0-alpha.5
+CAMERA FIRMWARE: <version>
+HACS INSTALL/UPDATE: PASS | FAIL
+SETUP: PASS | FAIL
+SNAPSHOT: PASS | FAIL
+STREAM: PASS | FAIL
+RELOAD/RESTART: PASS | FAIL
+UNLOAD/DELETE: PASS | FAIL
+SANITIZED LOGS: <none or relevant lines; redact passwords and credential URLs>
 ```
 
 ## Roll back
 
-In HACS, choose **Redownload** and select the previous published version, then restart Home Assistant. If no previous release is available, restore the pre-update Home Assistant backup. Re-add any removed integration entry as needed.
+Back up Home Assistant before rollback. Use HACS **Redownload** to select a previous version only if HACS actually lists one, then restart Home Assistant.
 
-Sources: [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository), [HACS custom repositories](https://hacs.xyz/docs/faq/custom_repositories/), [HACS repository dashboard](https://hacs.xyz/docs/use/repositories/dashboard/).
+If no previous version is listed, remove the integration entry using Home Assistant's [standard removal steps](https://www.home-assistant.io/common-tasks/general/#removing-an-integration-instance), remove the HACS repository, and restore the backup or known-good manually saved integration files. Deleting the integration entry removes its device and entities; removing only the HACS repository does not remove its Home Assistant data.
