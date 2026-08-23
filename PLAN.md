@@ -7,7 +7,7 @@ record.
 
 ## Process
 
-The coordinator follows `codex-prompt-v1.md`:
+The coordinator follows `codex-prompt-v2.md`:
 
 1. Agree the plan with the user before implementation.
 2. Set exactly one step to `started`.
@@ -70,13 +70,26 @@ By user decision on 2026-08-22:
   `0.2.1`, and `0.3.0`.
 - An issue's milestone records the intended delivery version. Release notes
   remain the definitive record of what actually shipped.
+- After every independently verified engineering step, the Coordinator
+  reconciles GitHub Issues: close resolved deliverables, create any new
+  findings, assign their intended milestones, and confirm no work is tracked
+  only in `PLAN.md`. Open issues for later steps are expected at this point.
+- Full milestone gates additionally happen at releases: the Engineer reports
+  milestone state at candidate handoff, the independent Verifier checks it
+  before release PASS, and the Coordinator queries GitHub again immediately
+  before every tag or publication.
+- Before a release candidate, every implementation issue for that milestone
+  must be closed; only the release-and-physical-verification issue may remain
+  open. After final publication, close that issue, confirm zero open issues,
+  and close the milestone. Any deliberate deferral must first be moved to a
+  later milestone with an explanatory comment.
 
 ## Active plan
 
-The physical `0.3.0` sound-conversion proof and Step 8 implementation are
-active in parallel by user direction. Architecture v2.1 now schedules the
-narrow `0.2.1` Camera access release after final `0.2.0` and before any
-`0.3.0` implementation.
+Step 9 release-candidate preparation is active. Architecture v2.1 schedules
+the narrow `0.2.1` Camera access release after final `0.2.0` and before any
+`0.3.0` implementation; the completed sound proof remains future architecture
+evidence only.
 
 **Roadmap:** `0.2.0` is the current baseline; `0.2.1` adds Camera access;
 `0.3.0` adds audio with a separate Audio switch.
@@ -330,7 +343,7 @@ publication, and functionality excluded by architecture section 2.
 
 ### Step 8 — 0.2.0 release readiness and branding
 
-**Status:** `started`
+**Status:** `verified`
 
 **Latest result:** Started immediately after the independently verified Step 7
 commit was pushed, by prior user direction. The Engineer completed the README
@@ -340,9 +353,13 @@ with the minimum listener/no-listener helper split required for Home Assistant
 reauthentication regression; the focused correction restored it. The second
 independent Verifier returned `PASS`: 52 tests, Ruff, dependency, compilation,
 and diff checks pass, with changed data reloading once and unchanged data zero
-times. Test, HACS, and Hassfest remain unverified on the exact eventual commit.
-The user directed us to create original rights-cleared local brand artwork;
-branding is the only remaining Step 8 implementation item.
+times. The user directed us to create original rights-cleared local brand artwork.
+Original transparent 256×256 and 512×512 camera/moon icons were added locally
+without vendor artwork, the HACS brand ignore was removed, and independent
+verification returned `PASS` with 52 tests and all local checks green. Commits
+`d3f9658`, `23eeaa6`, `428dba9`, and `7c0f9c5` are pushed. Test, HACS
+including brand validation, and Hassfest pass on the exact branding commit.
+The user directed work to advance immediately to Step 9.
 
 **Goal:** Finish documentation, branding, and any remaining architecture-v2
 acceptance work for the `0.2.0` line.
@@ -380,7 +397,12 @@ physically verify architecture v2.
 
 ### Step 9 — 0.2.0 prerelease and physical verification
 
-**Status:** `not started`
+**Status:** `started`
+
+**Latest result:** Started immediately after the independently verified
+branding commit was pushed, without waiting for its queued workflows by prior
+user direction. The Engineer is preparing only the `0.2.0-rc` candidate and
+release handoff; tags and releases remain subject to explicit user approval.
 
 **Goal:** Distribute and physically verify the architecture-complete `0.2.0`
 candidate.
@@ -392,7 +414,9 @@ completed architecture acceptance.
 
 **Acceptance criteria:**
 
-- Use the agreed `0.2.0` prerelease version and prepare accurate release notes.
+- Use manifest version `0.2.0-rc`, future tag `v0.2.0-rc`, and release title
+  `Home Assistant integration for reer IP BabyCam 0.2.0-rc`; prepare accurate
+  release notes without committing a redundant notes file.
 - Release only a clean, pushed commit with all automated checks passing.
 - Obtain explicit user approval before creating/pushing the tag or publishing
   the release.
