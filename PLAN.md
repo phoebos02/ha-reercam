@@ -65,12 +65,21 @@ By user decision on 2026-08-22:
 - Pull-request workflow triggers remain YAGNI until the repository actually
   uses pull requests.
 - Published release tags are immutable: never move or reuse an existing tag.
+- GitHub milestones represent intended release versions; issues represent
+  deliverables, not internal engineering steps. Active milestones are `0.2.0`,
+  `0.2.1`, and `0.3.0`.
+- An issue's milestone records the intended delivery version. Release notes
+  remain the definitive record of what actually shipped.
 
 ## Active plan
 
-The parallel `0.3.0` sound architecture proposal is the next decision gate.
-Step 7 implementation was started by prior user direction but remains paused
-until that proposal is presented; Step 8 follows Step 7 verification.
+The physical `0.3.0` sound-conversion proof and Step 8 implementation are
+active in parallel by user direction. Architecture v2.1 now schedules the
+narrow `0.2.1` Camera access release after final `0.2.0` and before any
+`0.3.0` implementation.
+
+**Roadmap:** `0.2.0` is the current baseline; `0.2.1` adds Camera access;
+`0.3.0` adds audio with a separate Audio switch.
 
 ### Parallel future architecture track — 0.3.0 sound
 
@@ -80,19 +89,53 @@ until that proposal is presented; Step 8 follows Step 7 verification.
 path is one-way listening through the existing ASF camera stream with no
 runtime code if the physical stream contains active Home Assistant-compatible
 AAC or MP3 audio. Physical stream characterization and a user architecture
-decision are required before writing architecture v3. Two-way talkback remains
-separate and is not proposed for `0.3.0`.
+decision are required before writing architecture v3. The user approved this
+scope: prefer zero code, permit one optional user-operated restream only if
+physical evidence proves it necessary, and exclude two-way talkback. The
+physical probe is implemented as `camera-audio-probe.py` with ignored local
+`camera.txt` and passed Architect review. Its sanitized result proves the ASF
+source contains active H.264 Main
+video and active 8 kHz mono `adpcm_ima_wav` audio at 32 kbit/s (453 audio
+packets in 15 seconds). Because that codec is outside Home Assistant's native
+AAC/MP3 remux path, a password-safe ADPCM-to-AAC playback experiment was run:
+the pipeline passed technically, and the user physically confirmed audible,
+continuous audio for the full 15-second run. Physical playback is `PASS`.
 
 **Goal:** Produce a decision-ready architecture-v3 proposal for adding sound,
 preferring one-way audio through the existing camera stream and documenting
 alternatives if physical stream evidence or Home Assistant compatibility makes
 that non-trivial.
 
-**Sequence gate:** The Architect works in parallel now, but the proposal is
-presented only after the `0.1.0` release and before Step 7 resumes. No 0.3.0
-code is implemented during architecture-v2 work.
+**Sequence gate:** Research and architecture may continue in parallel, but no
+`0.3.0` implementation begins until final `0.2.1` below is physically verified.
 
-**Tracked finding:** #17 Design sound support for 0.3.0.
+**Tracked finding:** #17 Design one-way sound support.
+
+### Scheduled architecture-v2.1 track — 0.2.1 Camera access
+
+**Status:** `not started`
+
+**Latest result:** `architecture-v2.1.md` defines one persisted native Camera
+access switch. Off blocks new snapshots and streams and terminates active Home
+Assistant media, but it explicitly makes no physical sensor, power, vendor-app,
+cloud, or microphone privacy claim. No camera write endpoint is authorized.
+The future Audio switch remains separate, subordinate to Camera access, and
+entirely outside `0.2.1`.
+
+**Goal:** Add the smallest native Home Assistant control for stopping and
+resuming this integration's camera/video and snapshot access, with exact and
+testable privacy semantics.
+
+**Sequence gate:** Start only after final `0.2.0` ships. Complete and physically
+verify final `0.2.1` before any `0.3.0` implementation begins.
+
+**Outside this track:** Guessed or unverified camera write commands, claims of
+physical camera privacy, audio playback/transcoding, an Audio switch, talkback,
+new runtime dependencies, polling, and speculative abstractions.
+
+**Tracked deliverables:** #21 Specify Camera access control architecture,
+#20 Add Camera access control, and #22 Release and physically verify Camera
+access.
 
 ### Step 6a — Quick repository and release cleanup
 
@@ -236,13 +279,21 @@ reauthentication, reconfiguration, branding, and the `0.2.0` line.
 
 ### Step 7 — Complete config-entry lifecycle for 0.2.0
 
-**Status:** `started`
+**Status:** `verified`
 
 **Latest result:** Started by explicit user direction after the verified Step 6
 implementation was committed and pushed. The Engineer is implementing only
 architecture sections 12–15, 19, and their section 20 coverage; Step 8 remains
-outside this pass. Work is paused by the user's revised ordering until `0.1.0`
-is released and the parallel `0.3.0` sound proposal has been presented.
+outside this pass. After final `0.1.0` release and approval of the parallel
+sound scope, the Engineer is restoring the preserved `stash@{0}` WIP and
+resuming Step 7. The Engineer completed the seven-file lifecycle diff: 50 tests
+and all local checks pass, with the original stash retained. The independent
+Verifier returned `PASS` with no findings; the only forward note is to recheck
+Home Assistant's warned reload-helper behavior before supporting 2026.12.
+The pushed commit's Test, HACS, and Hassfest workflows subsequently passed.
+Commit `0d9b557` is pushed, and the user accepted the result and directed work
+to move immediately to Step 8. Test, HACS, and Hassfest on the pushed commit
+are pending background confirmation.
 
 **Goal:** Start the `0.2.0` SemVer line and implement architecture sections
 12–15 as one cohesive config-entry lifecycle change.
@@ -279,7 +330,19 @@ publication, and functionality excluded by architecture section 2.
 
 ### Step 8 — 0.2.0 release readiness and branding
 
-**Status:** `not started`
+**Status:** `started`
+
+**Latest result:** Started immediately after the independently verified Step 7
+commit was pushed, by prior user direction. The Engineer completed the README
+and architecture coverage audit, then replaced the deprecated reload behavior
+with the minimum listener/no-listener helper split required for Home Assistant
+2026.12 compatibility. The first Verifier pass found the no-listener
+reauthentication regression; the focused correction restored it. The second
+independent Verifier returned `PASS`: 52 tests, Ruff, dependency, compilation,
+and diff checks pass, with changed data reloading once and unchanged data zero
+times. Test, HACS, and Hassfest remain unverified on the exact eventual commit.
+The user directed us to create original rights-cleared local brand artwork;
+branding is the only remaining Step 8 implementation item.
 
 **Goal:** Finish documentation, branding, and any remaining architecture-v2
 acceptance work for the `0.2.0` line.
@@ -299,9 +362,9 @@ release publication.
   documents implemented behavior.
 - Clearly disclose that the camera protocol sends authenticated media over
   plain HTTP on the local network.
-- Add the required brand assets through the Home Assistant brands process and
-  remove HACS `ignore: brands` once the assets are available. Obtain explicit
-  user approval before opening any external pull request.
+- Create original, rights-cleared local brand icons without copied vendor
+  artwork, text, or trademarked logo elements. Add transparent 256×256 and
+  512×512 PNG assets and remove HACS `ignore: brands` only after validation.
 - Close any remaining architecture section 20 coverage gaps.
 - All tests, lint/static checks, HACS validation, and Hassfest validation pass.
 - The independent Verifier checks the full architecture, repository, tests,
@@ -310,9 +373,10 @@ release publication.
   unstated assumption.
 - GitHub Issues record every resolution or deliberate deferral.
 
-**Tracked findings:** [#8 Complete real Home Assistant lifecycle coverage](https://github.com/phoebos02/ha-reercam/issues/8),
-[#9 Complete architecture-v2 README](https://github.com/phoebos02/ha-reercam/issues/9), and
-[#11 Add Home Assistant brand assets](https://github.com/phoebos02/ha-reercam/issues/11).
+**Tracked deliverables:** #8 Complete real Home Assistant lifecycle coverage,
+#9 Complete architecture-v2 README, #11 Add Home Assistant brand assets,
+#18 Use Home Assistant-compatible config entry reloads, and #19 Release and
+physically verify architecture v2.
 
 ### Step 9 — 0.2.0 prerelease and physical verification
 
@@ -358,3 +422,136 @@ version that completes architecture v2.
 - Obtain an independent Verifier pass and user agreement.
 - Obtain explicit user approval before creating/pushing the final tag or
   publishing the GitHub release.
+
+### Step 10a — Implement and verify architecture v2.1 for 0.2.1
+
+**Status:** `not started`
+
+**Goal:** Implement the native Camera access switch from
+`architecture-v2.1.md` while preserving the final `0.2.0` behavior and the
+architecture-v2 security boundary.
+
+**Work already completed:** Final `0.2.0` is the required baseline;
+`architecture-v2.1.md` specifies the privacy semantics, minimal state model,
+media cleanup, future audio boundary, and evidence gate.
+
+**Outside this step:** Release publication, camera-side write commands,
+physical sensor/power privacy claims, audio behavior or entities, talkback,
+new runtime dependencies, polling, and unrelated refactoring.
+
+**Acceptance criteria:**
+
+- Add one persisted Camera access switch on the camera device; existing
+  entries default to on.
+- Off makes no new snapshot request and returns no stream source or
+  credential-bearing media URL.
+- Off explicitly terminates active Home Assistant HLS/recording/WebRTC media
+  rather than waiting for an idle timeout.
+- Off survives reload and restart; on restores normal operation without a
+  proactive camera request.
+- State updates use the existing config-entry lifecycle and cause exactly one
+  reload, with no new storage/coordinator/dispatcher/dependency.
+- UI text, README, and tests state that this controls only the integration's
+  access and does not claim to disable physical capture or other clients.
+- No Audio entity, audio option, transcoder, or speculative camera command is
+  introduced.
+- Existing checks and the minimum tests in architecture-v2.1 section 10 pass.
+- An independent Verifier passes and the user agrees the implementation is
+  complete.
+
+### Step 10b — Release and physically verify 0.2.1
+
+**Status:** `not started`
+
+**Goal:** Release the verified Camera access change as `0.2.1` and prove its
+limited, documented behavior on the physical camera through HACS.
+
+**Work already completed:** Step 10a provides the independently verified
+implementation and automated coverage.
+
+**Outside this step:** Expanding the privacy claim, camera-side write research,
+and all `0.3.0` audio implementation.
+
+**Acceptance criteria:**
+
+- Manifest, README, and release notes use `0.2.1` and accurately describe
+  Camera access as integration-local control.
+- Release only a clean, pushed, independently verified commit with all
+  automated checks passing.
+- Obtain explicit user approval before creating/pushing a tag or publishing a
+  release.
+- Install through HACS and prove that off blocks new snapshots and streams,
+  stops an already active Home Assistant stream, and survives reload/restart.
+- Prove that on restores snapshots and streaming.
+- Confirm logs contain no secret, Digest material, or credential URL and
+  persist a sanitized physical-verification result.
+- Complete final `0.2.1` before allowing any `0.3.0` implementation to begin.
+
+**Tracked deliverable:** #22 Release and physically verify Camera access.
+
+### Step 11 — Complete and verify architecture v3 for 0.3.0
+
+**Status:** `not started`
+
+**Goal:** Turn the successful physical sound experiment into a standalone,
+decision-complete architecture for one-way audio and a separate Audio switch.
+
+**Work already completed:** The camera exposes active mono 8 kHz ADPCM audio
+on the existing ASF stream. The password-safe ADPCM-to-AAC pipeline passed,
+and the user confirmed audible, continuous playback for 15 seconds.
+
+**Outside this step:** Production audio code, two-way talkback, cloud/P2P,
+camera write commands, and implementation before final `0.2.1`.
+
+**Acceptance criteria:**
+
+- Select one optional user-operated restream mechanism that copies H.264 and
+  converts only ADPCM audio.
+- Prove Home Assistant HLS or WebRTC playback and record basic latency and CPU
+  observations.
+- Specify installation, configuration, credentials, failure, restart, update,
+  and removal behavior without storing media.
+- Define the separate Audio switch and its subordinate relationship to Camera
+  access.
+- Produce `architecture-v3.md`, obtain independent verification, and obtain
+  user approval before implementation.
+
+**Tracked deliverable:** #17 Design one-way sound support.
+
+### Step 12 — Implement and verify sound support for 0.3.0
+
+**Status:** `not started`
+
+**Goal:** Implement only the approved architecture-v3 one-way audio path and
+Audio access control on top of final `0.2.1`.
+
+**Acceptance criteria:**
+
+- Preserve copied H.264 video and convert only the camera's ADPCM audio.
+- Keep all media local and prevent credentials from appearing in entities,
+  process arguments, logs, diagnostics, or stored media.
+- Audio can be disabled independently while Camera access remains the master
+  media control.
+- Existing camera behavior and all architecture-v3 tests pass.
+- An independent Verifier passes before release work begins.
+
+**Tracked deliverables:** #23 Add optional one-way audio restream and #24 Add
+separate Audio access control.
+
+### Step 13 — Release and physically verify 0.3.0
+
+**Status:** `not started`
+
+**Goal:** Publish a release candidate, verify sound and privacy controls through
+HACS on the physical camera, and then publish final `0.3.0` after acceptance.
+
+**Acceptance criteria:**
+
+- Exact release commits pass Test, HACS, Hassfest, and independent verification.
+- HLS or WebRTC delivers audible, continuous audio with acceptable observed
+  latency and CPU use.
+- Camera access and Audio switches behave as documented across reload/restart.
+- Logs remain secret-safe, the user accepts the physical result, and explicit
+  approval is obtained before tags or releases are published.
+
+**Tracked deliverable:** #25 Release and physically verify sound support.
