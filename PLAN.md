@@ -38,13 +38,14 @@ steps; their former acceptance checklists are intentionally not duplicated.
 
 ### Step 9 — 0.2.0 release candidate and physical verification
 
-**Status:** `started`
+**Status:** `verified`
 
 **Latest result:** The Engineer prepared manifest/README version `0.2.0-rc` and
 then resolved the newly opened README simplification request by removing
 duplicate Scope, stream, lifecycle, and manual-HACS text while preserving all
-fourteen architecture-v2 documentation requirements. Independent verification
-and the final milestone audit are pending. No tag or release exists.
+fourteen architecture-v2 documentation requirements. The `v0.2.0-rc` release
+was published, installed through HACS, and physically verified PASS. The final
+milestone audit and issue closure are recorded in GitHub.
 
 **Goal:** Publish and physically verify the architecture-v2 release candidate.
 
@@ -60,7 +61,8 @@ and the final milestone audit are pending. No tag or release exists.
 - Full local checks and exact-commit Test, HACS, and Hassfest pass.
 - Milestone `0.2.0` has no open implementation issue; only the release issue
   may remain.
-- Obtain explicit approval before tagging or publishing.
+- Obtain explicit approval before tagging or publishing. **Complete:** approved,
+  tagged, published, installed, and physically verified.
 - Install through HACS and verify branding, setup, normalization, identity,
   firmware, duplicate prevention, snapshot, live stream, reauthentication,
   reconfiguration, reload/restart, unload/delete, and logs on the physical
@@ -68,7 +70,7 @@ and the final milestone audit are pending. No tag or release exists.
 - Persist the agreed physical pass/fail result.
 
 **Tracked:** #19 Release and physically verify architecture v2; #26 Simplify
-Readme.
+Readme. Both are resolved by the released candidate.
 
 ### Step 11 — Complete architecture v3 for 0.3.0
 
