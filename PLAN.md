@@ -28,9 +28,9 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `c130822e1215f992d7914ded827de28a7e263f62`.
+- Current `main`: `96d07bb3e0ebe50e233464ca47bf74c65a8a9aa1`.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, nine commits behind `main`.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, ten commits behind `main`.
 - Step 6's final simplification commit is pushed; Test, HACS, and Hassfest all
   pass.
 - Step 6 replaces the hand-written stubs with 26 tests against Python 3.14.2,
@@ -184,12 +184,15 @@ reauthentication, reconfiguration, branding, and documentation expansion.
 
 **Latest result:** Activated by user direction after Step 6 was committed,
 pushed, independently verified, and passed Test, HACS, and Hassfest. Release
-preparation is complete: the manifest now says `0.1.0`, repository-facing
-README wording is accurate, all 26 tests and local release checks pass, and
-the paused `0.2.0` work remains isolated in `stash@{0}`. Independent
-verification is active. The tag and GitHub release still require a clean
-pushed candidate with green workflows, the documented physical/HACS smoke
-result, and explicit final approval.
+preparation is committed and pushed as `96d07bb`: the manifest says `0.1.0`,
+repository-facing README wording is accurate, all 26 tests and local release
+checks pass, the independent Verifier returned `PASS`, and Test, HACS, and
+Hassfest pass on the exact candidate. The paused `0.2.0` work remains isolated
+in `stash@{0}`. By subsequent user direction, this candidate is being renamed
+to prerelease `0.1.0-rc.1`, with Git tag `v0.1.0-rc.1`; the final `0.1.0`
+promotion remains part of this release step. Tagging and GitHub publication
+still require the documented physical/HACS smoke result and explicit final
+approval.
 
 **Goal:** Release the tested current functional scope as `0.1.0` before work
 begins on the next SemVer line.
@@ -204,6 +207,8 @@ reauthentication, reconfiguration, branding, and the `0.2.0` line.
 
 - Manifest and release notes accurately describe the implemented scope and its
   known limitations.
+- The release-candidate manifest/README version is `0.1.0-rc.1` and its Git tag
+  is `v0.1.0-rc.1`; the manifest never includes the tag's `v` prefix.
 - Release only a clean, pushed commit with all checks passing.
 - Obtain explicit user approval before creating/pushing the `v0.1.0` tag or
   publishing the GitHub release.

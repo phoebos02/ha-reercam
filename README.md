@@ -9,7 +9,7 @@
 
 Home Assistant custom integration for the reer IP BabyCam 80300.
 
-Version 0.1.0 connects to the camera over the local network and provides
+Version 0.1.0-rc.1 connects to the camera over the local network and provides
 snapshots and live video through a Home Assistant camera entity.
 
 ## Features
@@ -50,7 +50,7 @@ if the repository cannot be added with the button.
 ## Configuration
 
 During setup, enter the camera's local hostname or IP address and the password
-for its `admin` user. Version 0.1.0 stores these values before contacting the
+for its `admin` user. Version 0.1.0-rc.1 stores these values before contacting the
 camera; the config form does not yet validate the connection. Use a DHCP
 reservation or static IP address so Home Assistant can continue to find the
 camera after network changes.
