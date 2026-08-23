@@ -28,7 +28,7 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `96d07bb3e0ebe50e233464ca47bf74c65a8a9aa1`.
+- Current `main`: `44422a5f5b9c902ca59d170cc3c7140166ed8f8e`.
 - `v0.1.0-alpha.5` is published from
   `db4e78c1e6231321984b0cd965caea23a66fd712`, ten commits behind `main`.
 - Step 6's final simplification commit is pushed; Test, HACS, and Hassfest all
@@ -71,6 +71,13 @@ verification.
 ### Parallel future architecture track — 0.3.0 sound
 
 **Status:** `started`
+
+**Latest result:** The Architect completed the options memo. The preferred
+path is one-way listening through the existing ASF camera stream with no
+runtime code if the physical stream contains active Home Assistant-compatible
+AAC or MP3 audio. Physical stream characterization and a user architecture
+decision are required before writing architecture v3. Two-way talkback remains
+separate and is not proposed for `0.3.0`.
 
 **Goal:** Produce a decision-ready architecture-v3 proposal for adding sound,
 preferring one-way audio through the existing camera stream and documenting
@@ -184,15 +191,17 @@ reauthentication, reconfiguration, branding, and documentation expansion.
 
 **Latest result:** Activated by user direction after Step 6 was committed,
 pushed, independently verified, and passed Test, HACS, and Hassfest. Release
-preparation is committed and pushed as `96d07bb`: the manifest says `0.1.0`,
-repository-facing README wording is accurate, all 26 tests and local release
-checks pass, the independent Verifier returned `PASS`, and Test, HACS, and
-Hassfest pass on the exact candidate. The paused `0.2.0` work remains isolated
-in `stash@{0}`. By subsequent user direction, this candidate is being renamed
-to prerelease `0.1.0-rc.1`, with Git tag `v0.1.0-rc.1`; the final `0.1.0`
-promotion remains part of this release step. Tagging and GitHub publication
-still require the documented physical/HACS smoke result and explicit final
-approval.
+preparation is committed and pushed as `44422a5`: the manifest and README say
+`0.1.0-rc.1`, the independent Verifier returned `PASS`, and Test, HACS, and
+Hassfest pass on the exact candidate. Prerelease `v0.1.0-rc.1` is published and
+installed. The user reports all physical verification checks 1–8 passed:
+installation visibility, setup, identity/firmware, snapshot/stream, reload,
+restart, unload/disable, and deletion cleanup. By explicit user direction,
+manual secret-log inspection and a separate sanitized-result artifact were
+skipped and remain recorded as unverified rather than passed. The user accepted
+the release-candidate result. Final promotion from `0.1.0-rc.1` to `0.1.0` is
+now being prepared; Step 7a remains started until that final release is
+published. The paused `0.2.0` work remains isolated in `stash@{0}`.
 
 **Goal:** Release the tested current functional scope as `0.1.0` before work
 begins on the next SemVer line.
