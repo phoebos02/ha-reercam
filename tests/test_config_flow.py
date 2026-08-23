@@ -155,13 +155,14 @@ async def test_user_rejects_duplicate_device(hass) -> None:
     ],
 )
 async def test_entry_update_succeeds_and_reloads_once(
-    hass, flow_name, user_input, expected_data, reason
+    hass, caplog, flow_name, user_input, expected_data, reason
 ) -> None:
     if flow_name == "reauth":
         entry = MockConfigEntry(
             domain=DOMAIN, data=DATA, unique_id=INFO.device_id
         )
         entry.add_to_hass(hass)
+        assert not entry.update_listeners
     else:
         entry = await _loaded_entry(hass)
     flow = await getattr(entry, f"start_{flow_name}_flow")(hass)
@@ -194,6 +195,50 @@ async def test_entry_update_succeeds_and_reloads_once(
     assert result["reason"] == reason
     assert dict(entry.data) == expected_data
     reload_entry.assert_awaited_once_with(entry.entry_id)
+    assert "2026.12" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("flow_name", "user_input", "reason"),
+    [
+        ("reauth", {CONF_PASSWORD: "old-password"}, "reauth_successful"),
+        ("reconfigure", {CONF_HOST: "camera.local"}, "reconfigure_successful"),
+    ],
+)
+async def test_unchanged_entry_update_does_not_reload(
+    hass, caplog, flow_name, user_input, reason
+) -> None:
+    if flow_name == "reauth":
+        entry = MockConfigEntry(
+            domain=DOMAIN, data=DATA, unique_id=INFO.device_id
+        )
+        entry.add_to_hass(hass)
+        assert not entry.update_listeners
+    else:
+        entry = await _loaded_entry(hass)
+    flow = await getattr(entry, f"start_{flow_name}_flow")(hass)
+
+    with (
+        patch(
+            "custom_components.reer_babycam.ReerBabyCamClient.async_get_info",
+            new=AsyncMock(return_value=INFO),
+        ),
+        patch.object(
+            hass.config_entries,
+            "async_reload",
+            new=AsyncMock(return_value=True),
+        ) as reload_entry,
+    ):
+        result = await hass.config_entries.flow.async_configure(
+            flow["flow_id"], user_input=user_input
+        )
+        await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == reason
+    assert dict(entry.data) == DATA
+    reload_entry.assert_not_awaited()
+    assert "2026.12" not in caplog.text
 
 
 @pytest.mark.parametrize(

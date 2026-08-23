@@ -72,18 +72,16 @@ class ReerBabyCamConfigFlow(ConfigFlow, domain=DOMAIN):
             return None, "unknown"
         return info, None
 
-    def _update_reload_and_abort(
+    def _update_and_abort(
         self, entry: ConfigEntry, updates: dict[str, Any]
     ) -> ConfigFlowResult:
-        """Update an entry and let exactly one native reload path run."""
-        if not entry.update_listeners:
-            return self.async_update_reload_and_abort(entry, data_updates=updates)
-
-        changed = self.hass.config_entries.async_update_entry(
-            entry, data={**entry.data, **updates}
-        )
+        """Update the entry and reload through its listener when available."""
+        if entry.update_listeners:
+            return self.async_update_and_abort(entry, data_updates=updates)
         return self.async_update_reload_and_abort(
-            entry, reload_even_if_entry_is_unchanged=not changed
+            entry,
+            data_updates=updates,
+            reload_even_if_entry_is_unchanged=False,
         )
 
     async def async_step_user(
@@ -139,7 +137,7 @@ class ReerBabyCamConfigFlow(ConfigFlow, domain=DOMAIN):
             elif info is None or info.device_id != entry.unique_id:
                 errors["base"] = "wrong_device"
             else:
-                return self._update_reload_and_abort(
+                return self._update_and_abort(
                     entry, {CONF_PASSWORD: user_input[CONF_PASSWORD]}
                 )
 
@@ -167,7 +165,7 @@ class ReerBabyCamConfigFlow(ConfigFlow, domain=DOMAIN):
                 elif info is None or info.device_id != entry.unique_id:
                     errors["base"] = "wrong_device"
                 else:
-                    return self._update_reload_and_abort(entry, {CONF_HOST: host})
+                    return self._update_and_abort(entry, {CONF_HOST: host})
 
         return self.async_show_form(
             step_id="reconfigure",
