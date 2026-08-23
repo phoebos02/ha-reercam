@@ -8,5 +8,5 @@
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/phoebos02/ha-reercam/issues",
-  "version": "0.2.0-rc"
+  "version": "0.2.0"
 }

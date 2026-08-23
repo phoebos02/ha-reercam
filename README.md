@@ -7,14 +7,10 @@
 [![Tests](https://github.com/phoebos02/ha-reercam/actions/workflows/test.yml/badge.svg)](https://github.com/phoebos02/ha-reercam/actions/workflows/test.yml)
 [![License](https://img.shields.io/github/license/phoebos02/ha-reercam)](LICENSE)
 
-Version 0.2.0-rc supports the reer IP BabyCam 80300 and is verified with
-firmware `42.7.3.4.70`.
+Version 0.2.0 supports the reer IP BabyCam 80300 and is verified with firmware
+`42.7.3.4.70`.
 
-> [!WARNING]
-> The camera uses HTTP Digest authentication over plain HTTP. Authentication
-> does not encrypt the video, snapshots, or authentication exchange. Keep the
-> camera on a trusted local network and never expose its HTTP port to the
-> internet.
+> [!WARNING] The camera uses HTTP Digest authentication over plain HTTP and does not encrypt the video, snapshots, or authentication exchange. Keep the camera on a trusted local network and never expose its HTTP port to the internet.
 
 ## Features
 
