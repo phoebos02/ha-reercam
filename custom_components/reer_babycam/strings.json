@@ -7,7 +7,30 @@
           "host": "Host",
           "password": "Password"
         }
+      },
+      "reauth_confirm": {
+        "data": {
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "data": {
+          "host": "Host"
+        }
       }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the camera",
+      "invalid_auth": "Invalid password",
+      "invalid_host": "Enter a valid hostname or IP address without a scheme, port, or path",
+      "invalid_response": "The camera returned an invalid response",
+      "unknown": "Unexpected error",
+      "wrong_device": "The camera at this address is a different device"
+    },
+    "abort": {
+      "already_configured": "This camera is already configured",
+      "reauth_successful": "Reauthentication was successful",
+      "reconfigure_successful": "Reconfiguration was successful"
     }
   }
 }

@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from aiohttp import ClientConnectionError
 from homeassistant.components.camera.const import DATA_COMPONENT
-from homeassistant.config_entries import ConfigEntryState
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.const import CONF_HOST, CONF_PASSWORD
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
@@ -27,7 +27,7 @@ JPEG = b"\xff\xd8jpeg\xff\xd9"
 
 
 async def _setup(hass, info: ReerBabyCamInfo = INFO) -> MockConfigEntry:
-    entry = MockConfigEntry(domain=DOMAIN, data=DATA)
+    entry = MockConfigEntry(domain=DOMAIN, data=DATA, unique_id=info.device_id)
     entry.add_to_hass(hass)
     with patch(
         "custom_components.reer_babycam.ReerBabyCamClient.async_get_info",
@@ -43,6 +43,7 @@ async def test_setup_camera_device_snapshot_stream_and_unload(hass) -> None:
 
     assert entry.state is ConfigEntryState.LOADED
     assert entry.runtime_data.info == INFO
+    assert len(entry.update_listeners) == 1
 
     entity_registry = er.async_get(hass)
     entity_id = entity_registry.async_get_entity_id(
@@ -83,10 +84,22 @@ async def test_setup_camera_device_snapshot_stream_and_unload(hass) -> None:
         "http://admin:do-not-leak@camera.local/av.asf?stream=1"
     )
 
+    with patch(
+        "custom_components.reer_babycam.ReerBabyCamClient.async_get_info",
+        new=AsyncMock(return_value=INFO),
+    ):
+        hass.config_entries.async_update_entry(
+            entry, data={**entry.data, CONF_PASSWORD: "new-password"}
+        )
+        await hass.async_block_till_done()
+    assert entry.state is ConfigEntryState.LOADED
+    assert len(entry.update_listeners) == 1
+
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
     assert entry.state is ConfigEntryState.NOT_LOADED
     assert hass.data[DATA_COMPONENT].get_entity(entity_id) is None
+    assert not entry.update_listeners
 
 
 async def test_optional_firmware(hass) -> None:
@@ -136,15 +149,25 @@ async def test_snapshot_errors_are_secret_free(
 
 
 @pytest.mark.parametrize(
-    ("error", "state"),
+    ("error", "state", "reauth"),
     [
-        (ReerBabyCamConnectionError("do-not-leak"), ConfigEntryState.SETUP_RETRY),
-        (ReerBabyCamAuthError("do-not-leak"), ConfigEntryState.SETUP_ERROR),
-        (ReerBabyCamProtocolError("do-not-leak"), ConfigEntryState.SETUP_ERROR),
+        (
+            ReerBabyCamConnectionError("do-not-leak"),
+            ConfigEntryState.SETUP_RETRY,
+            False,
+        ),
+        (ReerBabyCamAuthError("do-not-leak"), ConfigEntryState.SETUP_ERROR, True),
+        (
+            ReerBabyCamProtocolError("do-not-leak"),
+            ConfigEntryState.SETUP_ERROR,
+            False,
+        ),
     ],
 )
-async def test_setup_error_mapping_is_secret_free(hass, caplog, error, state) -> None:
-    entry = MockConfigEntry(domain=DOMAIN, data=DATA)
+async def test_setup_error_mapping_is_secret_free(
+    hass, caplog, error, state, reauth
+) -> None:
+    entry = MockConfigEntry(domain=DOMAIN, data=DATA, unique_id=INFO.device_id)
     entry.add_to_hass(hass)
 
     with patch(
@@ -155,4 +178,35 @@ async def test_setup_error_mapping_is_secret_free(hass, caplog, error, state) ->
         await hass.async_block_till_done()
 
     assert entry.state is state
+    assert any(
+        flow["context"]["source"] == SOURCE_REAUTH
+        for flow in hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    ) is reauth
+    assert "do-not-leak" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("data", "unique_id", "info"),
+    [
+        (DATA, INFO.device_id, ReerBabyCamInfo("other-device", None)),
+        (DATA, None, INFO),
+        ({CONF_HOST: "camera.local"}, INFO.device_id, INFO),
+    ],
+)
+async def test_setup_rejects_mismatch_or_missing_data_without_runtime_data(
+    hass, caplog, data, unique_id, info
+) -> None:
+    entry = MockConfigEntry(domain=DOMAIN, data=data, unique_id=unique_id)
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.reer_babycam.ReerBabyCamClient.async_get_info",
+        new=AsyncMock(return_value=info),
+    ):
+        assert not await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state is ConfigEntryState.SETUP_ERROR
+    assert not hasattr(entry, "runtime_data")
+    assert "other-device" not in caplog.text
     assert "do-not-leak" not in caplog.text
