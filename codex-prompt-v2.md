@@ -24,15 +24,10 @@ intended release versions. A release note records what actually shipped.
 ## Project intent and release order
 
 The integration is local-only for the reer IP BabyCam 80300. Preserve the
-architecture's security boundary: authenticated plain HTTP is trusted-LAN
-only, credentials and media URLs must never leak into logs, diagnostics,
-process arguments, or stored test artifacts.
+applicable architecture and repository behavior.
 
-The release order is:
-
-1. Finish and release `0.2.0`.
-2. Implement, release, and physically verify `0.2.1` Camera access.
-3. Only then implement, release, and physically verify `0.3.0` sound.
+The current release sequence, milestones, and gates are maintained in
+`PLAN.md`; read that file rather than duplicating the sequence here.
 
 Architecture v2 defines the original integration contract. Architecture v2.1
 adds the integration-local Camera access switch. Architecture v3 is intended
@@ -51,7 +46,7 @@ Use for one defined implementation step. The Engineer receives the complete
 goal, existing work, exclusions, acceptance criteria, and issue/milestone
 context. It may edit only the owned implementation files. It must not broaden
 the step, change later-step files, edit `PLAN.md` or GitHub tracking, commit,
-push, tag, publish, or read/print `camera.txt`.
+push, tag, or publish.
 
 ### Verifier
 
@@ -91,7 +86,8 @@ Use issues for concrete defects, features, architecture deliverables, and
 release/physical-verification gates. Do not duplicate every plan step.
 
 Every open issue must have a milestone or an explicit reason to remain
-unmilestoned. Current release milestones are `0.2.0`, `0.2.1`, and `0.3.0`.
+unmilestoned. Use the milestones and release assignments recorded in
+`PLAN.md`.
 Move deliberate deferrals to a later milestone and comment why.
 
 After each verified step, reconcile issue state. Before an RC, every
@@ -120,27 +116,15 @@ If the user explicitly says not to wait for workflows, advance planning or the
 next safe engineering step without claiming the workflows passed. Before any
 release publication, the exact candidate workflows must be checked.
 
-Use established metadata unless the user changes it:
-
-- RC tag: `v0.2.0-rc`
-- RC title: `Home Assistant integration for reer IP BabyCam 0.2.0-rc`
-- Final and later versions use the same `v` tag convention.
+Use the release metadata and tag convention recorded in `PLAN.md` and the
+current release issue.
 
 ## Verification expectations
 
 Prefer the smallest meaningful check. For non-trivial code, leave one runnable
 test or self-check. The normal local baseline is the repository's virtualenv,
-full pytest, Ruff, dependency validation, JSON/YAML parsing, compilation,
-secret-safe log assertions, and `git diff --check`.
-
-Physical verification must be sanitized. Never read, print, commit, or upload
-`camera.txt`; it is local, ignored, and mode `600`. Probe output may contain
-only sanitized media facts. Do not store camera media.
-
-For audio, the known evidence is active H.264 plus mono 8 kHz ADPCM on the ASF
-stream and a technically successful, audible, continuous 15-second
-ADPCM-to-AAC playback experiment. This is evidence, not permission to skip the
-architecture-v3 Home Assistant HLS/WebRTC proof.
+full pytest, Ruff, dependency validation, JSON/YAML parsing, compilation, and
+`git diff --check`.
 
 ## Reports
 
