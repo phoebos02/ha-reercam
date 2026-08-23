@@ -28,9 +28,11 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `44422a5f5b9c902ca59d170cc3c7140166ed8f8e`.
+- Current `main`: `38c7db887f2e1db91543295c9aef77eab808e730`.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, ten commits behind `main`.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, eleven commits behind `main`.
+- Final `v0.1.0` is published from `38c7db8`, installed through HACS, and
+  physically verified `PASS` by the user.
 - Step 6's final simplification commit is pushed; Test, HACS, and Hassfest all
   pass.
 - Step 6 replaces the hand-written stubs with 26 tests against Python 3.14.2,
@@ -63,10 +65,9 @@ By user decision on 2026-08-22:
 
 ## Active plan
 
-Step 7a is active. Step 7 implementation was started by prior user direction
-but is now paused: release `0.1.0`, then present the parallel `0.3.0` sound
-architecture proposal, then resume `0.2.0` work. Step 8 follows Step 7
-verification.
+The parallel `0.3.0` sound architecture proposal is the next decision gate.
+Step 7 implementation was started by prior user direction but remains paused
+until that proposal is presented; Step 8 follows Step 7 verification.
 
 ### Parallel future architecture track — 0.3.0 sound
 
@@ -187,7 +188,7 @@ reauthentication, reconfiguration, branding, and documentation expansion.
 
 ### Step 7a — Release 0.1.0
 
-**Status:** `started`
+**Status:** `verified`
 
 **Latest result:** Activated by user direction after Step 6 was committed,
 pushed, independently verified, and passed Test, HACS, and Hassfest. Release
@@ -199,9 +200,13 @@ installation visibility, setup, identity/firmware, snapshot/stream, reload,
 restart, unload/disable, and deletion cleanup. By explicit user direction,
 manual secret-log inspection and a separate sanitized-result artifact were
 skipped and remain recorded as unverified rather than passed. The user accepted
-the release-candidate result. Final promotion from `0.1.0-rc.1` to `0.1.0` is
-now being prepared; Step 7a remains started until that final release is
-published. The paused `0.2.0` work remains isolated in `stash@{0}`.
+the release-candidate result. Final promotion is committed and pushed as
+`38c7db8`: the manifest and README say `0.1.0`, the independent Verifier
+returned `PASS`, and Test, HACS, and Hassfest pass on the exact final
+candidate. Final `v0.1.0` is now published, installed through
+HACS, and reported `PASS` by the user. Manual secret-log inspection and a
+separate sanitized-result artifact remain explicitly waived/unverified. The
+paused `0.2.0` work remains isolated in `stash@{0}`.
 
 **Goal:** Release the tested current functional scope as `0.1.0` before work
 begins on the next SemVer line.
