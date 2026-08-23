@@ -28,9 +28,12 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `38c7db887f2e1db91543295c9aef77eab808e730`.
+- Final `0.1.0` implementation commit:
+  `38c7db887f2e1db91543295c9aef77eab808e730`; `main` may contain later
+  plan-only tracking commits.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, eleven commits behind `main`.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, eleven commits before the final
+  `0.1.0` implementation.
 - Final `v0.1.0` is published from `38c7db8`, installed through HACS, and
   physically verified `PASS` by the user.
 - Step 6's final simplification commit is pushed; Test, HACS, and Hassfest all
