@@ -28,10 +28,11 @@ Allowed statuses are `not started`, `started`, and `verified`.
 
 As of 2026-08-23:
 
-- Current `main`: `ea5a6e21e5ca6f89e85ef19456edcfc9bf9e5006`.
+- Current `main`: `c130822e1215f992d7914ded827de28a7e263f62`.
 - `v0.1.0-alpha.5` is published from
-  `db4e78c1e6231321984b0cd965caea23a66fd712`, eight commits behind `main`.
-- Current `main` passes Test, Hassfest, and HACS workflows.
+  `db4e78c1e6231321984b0cd965caea23a66fd712`, nine commits behind `main`.
+- Step 6's final simplification commit is pushed; Test, HACS, and Hassfest all
+  pass.
 - Step 6 replaces the hand-written stubs with 26 tests against Python 3.14.2,
   Home Assistant 2026.8.3, and real aiohttp/yarl; pytest and Ruff pass.
 - Alpha.5 implements the narrow HTTP client, runtime setup, one device, one
@@ -62,7 +63,25 @@ By user decision on 2026-08-22:
 
 ## Active plan
 
-Step 6 is active. Steps must run in the order below.
+Step 7a is active. Step 7 implementation was started by prior user direction
+but is now paused: release `0.1.0`, then present the parallel `0.3.0` sound
+architecture proposal, then resume `0.2.0` work. Step 8 follows Step 7
+verification.
+
+### Parallel future architecture track — 0.3.0 sound
+
+**Status:** `started`
+
+**Goal:** Produce a decision-ready architecture-v3 proposal for adding sound,
+preferring one-way audio through the existing camera stream and documenting
+alternatives if physical stream evidence or Home Assistant compatibility makes
+that non-trivial.
+
+**Sequence gate:** The Architect works in parallel now, but the proposal is
+presented only after the `0.1.0` release and before Step 7 resumes. No 0.3.0
+code is implemented during architecture-v2 work.
+
+**Tracked finding:** #17 Design sound support for 0.3.0.
 
 ### Step 6a — Quick repository and release cleanup
 
@@ -116,7 +135,7 @@ full README completion, tooling configuration, and new releases.
 
 ### Step 6 — Real Home Assistant 2026.8 test baseline
 
-**Status:** `started`
+**Status:** `verified`
 
 **Latest result:** Commit `ea5a6e2` contains the complete Engineer and coverage
 correction passes. The fresh GitHub Test workflow installs Python 3.14.2 and
@@ -127,8 +146,9 @@ optional Ponytail test simplifications, and a focused follow-up now proves the
 HTTP status-to-exception mapping explicitly. The final independent Verifier
 returned `PASS` with no findings: all 26 tests, Ruff, dependency and repository
 checks pass, the test/dependency diff remains 33 lines smaller, and no
-production or CI files changed. The result is ready to commit; post-push Test,
-HACS, and Hassfest evidence is still required before Step 6 acceptance.
+production or CI files changed. Commit `c130822` is pushed; Test, HACS, and
+Hassfest all pass. The user accepted the result and directed the plan to
+advance.
 
 **Goal:** Verify the existing alpha.5 behavior against Home Assistant 2026.8
 and establish the complete minimal test, lint, and CI foundation.
@@ -160,7 +180,16 @@ reauthentication, reconfiguration, branding, and documentation expansion.
 
 ### Step 7a — Release 0.1.0
 
-**Status:** `not started`
+**Status:** `started`
+
+**Latest result:** Activated by user direction after Step 6 was committed,
+pushed, independently verified, and passed Test, HACS, and Hassfest. Release
+preparation is complete: the manifest now says `0.1.0`, repository-facing
+README wording is accurate, all 26 tests and local release checks pass, and
+the paused `0.2.0` work remains isolated in `stash@{0}`. Independent
+verification is active. The tag and GitHub release still require a clean
+pushed candidate with green workflows, the documented physical/HACS smoke
+result, and explicit final approval.
 
 **Goal:** Release the tested current functional scope as `0.1.0` before work
 begins on the next SemVer line.
@@ -185,7 +214,13 @@ reauthentication, reconfiguration, branding, and the `0.2.0` line.
 
 ### Step 7 — Complete config-entry lifecycle for 0.2.0
 
-**Status:** `not started`
+**Status:** `started`
+
+**Latest result:** Started by explicit user direction after the verified Step 6
+implementation was committed and pushed. The Engineer is implementing only
+architecture sections 12–15, 19, and their section 20 coverage; Step 8 remains
+outside this pass. Work is paused by the user's revised ordering until `0.1.0`
+is released and the parallel `0.3.0` sound proposal has been presented.
 
 **Goal:** Start the `0.2.0` SemVer line and implement architecture sections
 12–15 as one cohesive config-entry lifecycle change.
@@ -235,6 +270,9 @@ release publication.
 
 **Acceptance criteria:**
 
+- Use `Home Assistant integration for reer IP BabyCam` as the
+  repository-facing title in the README and GitHub repository description;
+  retain `reer IP BabyCam` for the Home Assistant and HACS integration name.
 - README covers all fourteen requirements in architecture section 22 and only
   documents implemented behavior.
 - Clearly disclose that the camera protocol sends authenticated media over

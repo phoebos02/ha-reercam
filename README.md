@@ -1,16 +1,16 @@
-# reer IP BabyCam
+# Home Assistant integration for reer IP BabyCam
 
-[![Release](https://img.shields.io/github/v/release/phoebos02/ha-reercam?include_prereleases&sort=semver)](https://github.com/phoebos02/ha-reercam/releases)
+[![Release](https://img.shields.io/github/v/release/phoebos02/ha-reercam?sort=semver)](https://github.com/phoebos02/ha-reercam/releases)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](#installation-with-hacs)
 [![HACS validation](https://github.com/phoebos02/ha-reercam/actions/workflows/hacs.yml/badge.svg)](https://github.com/phoebos02/ha-reercam/actions/workflows/hacs.yml)
 [![Hassfest validation](https://github.com/phoebos02/ha-reercam/actions/workflows/hassfest.yml/badge.svg)](https://github.com/phoebos02/ha-reercam/actions/workflows/hassfest.yml)
 [![Tests](https://github.com/phoebos02/ha-reercam/actions/workflows/test.yml/badge.svg)](https://github.com/phoebos02/ha-reercam/actions/workflows/test.yml)
 [![License](https://img.shields.io/github/license/phoebos02/ha-reercam)](LICENSE)
 
-Alpha Home Assistant custom integration for the reer IP BabyCam 80300.
+Home Assistant custom integration for the reer IP BabyCam 80300.
 
-This alpha integration connects to the camera over the local network and
-provides snapshots and live video through a Home Assistant camera entity.
+Version 0.1.0 connects to the camera over the local network and provides
+snapshots and live video through a Home Assistant camera entity.
 
 ## Features
 
@@ -28,8 +28,7 @@ You must already have [HACS](https://hacs.xyz/) installed.
 [![Open your Home Assistant instance and add the reer IP BabyCam repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=phoebos02&repository=ha-reercam&category=integration)
 
 Select your Home Assistant instance, add the repository, download **reer IP
-BabyCam**, and restart Home Assistant. If HACS offers prereleases, select the
-prerelease you intend to install before downloading.
+BabyCam**, and restart Home Assistant.
 
 **2. Add the integration after restarting**
 
@@ -40,8 +39,7 @@ prerelease you intend to install before downloading.
 1. In HACS, open the three-dot menu and select **Custom repositories**.
 2. Enter `https://github.com/phoebos02/ha-reercam`, select **Integration**, and
    choose **Add**.
-3. Open **reer IP BabyCam**, select the intended prerelease if applicable, and
-   choose **Download**.
+3. Open **reer IP BabyCam** and choose **Download**.
 4. Restart Home Assistant.
 5. Go to **Settings → Devices & services → Add integration** and select
    **reer IP BabyCam**.
@@ -52,14 +50,19 @@ if the repository cannot be added with the button.
 ## Configuration
 
 During setup, enter the camera's local hostname or IP address and the password
-for its `admin` user. Use a DHCP reservation or static IP address so Home
-Assistant can continue to find the camera after network changes.
+for its `admin` user. Version 0.1.0 stores these values before contacting the
+camera; the config form does not yet validate the connection. Use a DHCP
+reservation or static IP address so Home Assistant can continue to find the
+camera after network changes.
 
 ## Requirements and status
 
-- This integration is **alpha** software.
 - It currently supports the reer IP BabyCam 80300.
 - The camera must be reachable from Home Assistant on the local network.
+- Camera traffic uses authenticated plain HTTP and should remain on a trusted
+  local network.
+- Camera identity and duplicate entries are not checked in the config form.
+- Reauthentication and host reconfiguration flows are not available yet.
 
 ## Support
 
