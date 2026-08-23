@@ -209,6 +209,9 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
+# Local camera credentials
+camera.txt
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
