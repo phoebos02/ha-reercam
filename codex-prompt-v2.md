@@ -109,7 +109,7 @@ current release issue.
 
 Prefer the smallest meaningful check. For non-trivial code, leave one runnable
 test or self-check. The normal local baseline is the repository's virtualenv,
-full pytest, Ruff, dependency validation, JSON/YAML parsing, compilation, and
+one full pytest run (exactly once), Ruff, dependency validation, JSON/YAML parsing, compilation, and
 `git diff --check`.
 
 ## Reports
