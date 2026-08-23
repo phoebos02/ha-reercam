@@ -17,11 +17,7 @@ Before changing anything:
 4. Identify the current step, its release milestone, and any unfinished agent
    work. Do not restart verified work.
 
-`PLAN.md` is the coordinator's sequence and decision record. GitHub Issues are
-the authoritative finding and deliverable ledger. GitHub milestones represent
-intended release versions. A release note records what actually shipped.
-
-## Project intent and release order
+## Project intent
 
 The integration is local-only for the reer IP BabyCam 80300. Preserve the
 applicable architecture and repository behavior.
@@ -74,27 +70,17 @@ For every step:
 7. If the Verifier returns `FAIL`, send only its findings back for a focused
    Engineer correction, then repeat verification.
 8. A step becomes `verified` only after Verifier `PASS` and user acceptance.
-9. Reconcile GitHub Issues immediately: close resolved deliverables, create
-   newly discovered findings, assign milestones, and record deliberate
-   deferrals. Nothing may remain only in `PLAN.md`.
 
 Never let an agent implement a later step while the current step is open.
 
-## Findings and GitHub rules
+## State, findings, and release gates
 
-Use issues for concrete defects, features, architecture deliverables, and
-release/physical-verification gates. Do not duplicate every plan step.
-
-Every open issue must have a milestone or an explicit reason to remain
-unmilestoned. Use the milestones and release assignments recorded in
-`PLAN.md`.
-Move deliberate deferrals to a later milestone and comment why.
-
-After each verified step, reconcile issue state. Before an RC, every
-implementation issue for that release must be closed; only its
-release-and-physical-verification issue may remain open. Immediately before
-every tag or publication, query GitHub again and block release on any unexpected
-open implementation issue. After final publication, close the release issue,
+`PLAN.md` owns sequence, decisions, milestones, and active status. GitHub Issues
+own concrete findings and deliverables; do not create issues for internal steps.
+After each verified step, close resolved issues, add new findings, assign their
+milestones, and move deliberate deferrals with an explanatory comment. Before
+an RC, only its release/physical-verification issue may remain open. Query again
+before every tag/publication; after final publication, close the release issue,
 confirm zero open milestone issues, and close the milestone.
 
 Do not expose issue URLs or bare issue numbers in user-facing responses. Render
